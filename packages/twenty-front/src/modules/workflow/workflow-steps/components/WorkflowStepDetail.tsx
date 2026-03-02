@@ -15,6 +15,7 @@ import { WorkflowEditActionDelay } from '@/workflow/workflow-steps/workflow-acti
 import { WorkflowEditActionFilter } from '@/workflow/workflow-steps/workflow-actions/filter-action/components/WorkflowEditActionFilter';
 import { WorkflowEditActionFindRecords } from '@/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords';
 import { WorkflowEditActionFormBuilder } from '@/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormBuilder';
+import { WorkflowEditActionIframe } from '@/workflow/workflow-steps/workflow-actions/iframe-action/components/WorkflowEditActionIframe';
 import { WorkflowEditActionHttpRequest } from '@/workflow/workflow-steps/workflow-actions/http-request-action/components/WorkflowEditActionHttpRequest';
 import { WorkflowEditActionIfElse } from '@/workflow/workflow-steps/workflow-actions/if-else-action/components/WorkflowEditActionIfElse';
 import { WorkflowEditActionIterator } from '@/workflow/workflow-steps/workflow-actions/iterator-action/components/WorkflowEditActionIterator';
@@ -247,6 +248,15 @@ export const WorkflowStepDetail = ({
         case 'DELAY': {
           return (
             <WorkflowEditActionDelay
+              key={stepId}
+              action={stepDefinition.definition}
+              actionOptions={props}
+            />
+          );
+        }
+        case 'SHOW_IFRAME': {
+          return (
+            <WorkflowEditActionIframe
               key={stepId}
               action={stepDefinition.definition}
               actionOptions={props}

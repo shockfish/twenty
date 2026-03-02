@@ -569,6 +569,21 @@ export class WorkflowVersionStepOperationsWorkspaceService {
           },
         };
       }
+      case WorkflowActionType.SHOW_IFRAME: {
+        return {
+          builtStep: {
+            ...baseStep,
+            name: 'Show Iframe',
+            type: WorkflowActionType.SHOW_IFRAME,
+            settings: {
+              ...BASE_STEP_DEFINITION,
+              input: {
+                url: '',
+              },
+            },
+          },
+        };
+      }
       default:
         throw new WorkflowVersionStepException(
           `WorkflowActionType '${type}' unknown`,

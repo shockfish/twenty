@@ -16,6 +16,7 @@ import { WorkflowEditActionDelay } from '@/workflow/workflow-steps/workflow-acti
 import { WorkflowEditActionFilter } from '@/workflow/workflow-steps/workflow-actions/filter-action/components/WorkflowEditActionFilter';
 import { WorkflowEditActionFindRecords } from '@/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords';
 import { WorkflowEditActionFormFiller } from '@/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormFiller';
+import { WorkflowEditActionIframeFiller } from '@/workflow/workflow-steps/workflow-actions/iframe-action/components/WorkflowEditActionIframeFiller';
 import { WorkflowEditActionHttpRequest } from '@/workflow/workflow-steps/workflow-actions/http-request-action/components/WorkflowEditActionHttpRequest';
 import { WorkflowEditActionIfElse } from '@/workflow/workflow-steps/workflow-actions/if-else-action/components/WorkflowEditActionIfElse';
 import { WorkflowEditActionIterator } from '@/workflow/workflow-steps/workflow-actions/iterator-action/components/WorkflowEditActionIterator';
@@ -283,6 +284,17 @@ export const WorkflowRunStepNodeDetail = ({
               action={stepDefinition.definition}
               actionOptions={{
                 readonly: true,
+              }}
+            />
+          );
+        }
+        case 'SHOW_IFRAME': {
+          return (
+            <WorkflowEditActionIframeFiller
+              key={stepId}
+              action={stepDefinition.definition}
+              actionOptions={{
+                readonly: stepExecutionStatus !== 'PENDING',
               }}
             />
           );
