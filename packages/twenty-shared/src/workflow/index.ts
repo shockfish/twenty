@@ -40,6 +40,8 @@ export {
   stepIfElseBranchSchema,
   workflowIfElseActionSettingsSchema,
 } from './schemas/if-else-action-settings-schema';
+export { workflowIframeActionSchema } from './schemas/iframe-action-schema';
+export { workflowIframeActionSettingsSchema } from './schemas/iframe-action-settings-schema';
 export { workflowIteratorActionSchema } from './schemas/iterator-action-schema';
 export { workflowIteratorActionSettingsSchema } from './schemas/iterator-action-settings-schema';
 export { workflowLogicFunctionActionSchema } from './schemas/logic-function-action-schema';

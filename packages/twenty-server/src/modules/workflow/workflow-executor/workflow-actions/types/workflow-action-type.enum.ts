@@ -16,4 +16,5 @@ export enum WorkflowActionType {
   ITERATOR = 'ITERATOR',
   EMPTY = 'EMPTY',
   DELAY = 'DELAY',
+  SHOW_IFRAME = 'SHOW_IFRAME',
 }

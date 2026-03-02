@@ -11,6 +11,7 @@ import { DelayActionModule } from 'src/modules/workflow/workflow-executor/workfl
 import { EmptyActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/empty/empty-action.module';
 import { FilterActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/filter/filter-action.module';
 import { FormActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/form/form-action.module';
+import { IframeActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/iframe/iframe-action.module';
 import { IfElseActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/if-else/if-else-action.module';
 import { IteratorActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/iterator/iterator-action.module';
 import { LogicFunctionActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/logic-function/logic-function-action.module';
@@ -34,6 +35,7 @@ import { WorkflowRunModule } from 'src/modules/workflow/workflow-runner/workflow
     IteratorActionModule,
     AiAgentActionModule,
     EmptyActionModule,
+    IframeActionModule,
     FeatureFlagModule,
     ToolModule,
   ],

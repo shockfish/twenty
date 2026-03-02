@@ -23,6 +23,7 @@ export const getActionIconColorOrThrow = ({
     case 'FIND_RECORDS':
       return theme.font.color.tertiary;
     case 'FORM':
+    case 'SHOW_IFRAME':
       return theme.color.orange;
     case 'ITERATOR':
     case 'EMPTY':

@@ -20,6 +20,7 @@ import { workflowHasRunningSteps } from 'src/modules/workflow/common/utils/workf
 import { WorkflowCommonWorkspaceService } from 'src/modules/workflow/common/workspace-services/workflow-common.workspace-service';
 import { WorkflowVersionStepOperationsWorkspaceService } from 'src/modules/workflow/workflow-builder/workflow-version-step/workflow-version-step-operations.workspace-service';
 import { isWorkflowFormAction } from 'src/modules/workflow/workflow-executor/workflow-actions/form/guards/is-workflow-form-action.guard';
+import { isWorkflowIframeAction } from 'src/modules/workflow/workflow-executor/workflow-actions/iframe/guards/is-workflow-iframe-action.guard';
 import {
   WorkflowRunException,
   WorkflowRunExceptionCode,
@@ -157,7 +158,7 @@ export class WorkflowRunnerWorkspaceService {
       );
     }
 
-    if (!isWorkflowFormAction(step)) {
+    if (!isWorkflowFormAction(step) && !isWorkflowIframeAction(step)) {
       throw new WorkflowVersionStepException(
         'Step is not a form',
         WorkflowVersionStepExceptionCode.INVALID_REQUEST,
@@ -167,14 +168,15 @@ export class WorkflowRunnerWorkspaceService {
       );
     }
 
-    const enrichedResponse =
-      await this.workflowVersionStepOperationsWorkspaceService.enrichFormStepResponse(
-        {
-          workspaceId,
-          step,
-          response,
-        },
-      );
+    const enrichedResponse = isWorkflowFormAction(step)
+      ? await this.workflowVersionStepOperationsWorkspaceService.enrichFormStepResponse(
+          {
+            workspaceId,
+            step,
+            response,
+          },
+        )
+      : {};
 
     await this.workflowRunWorkspaceService.updateWorkflowRunStepInfo({
       stepId,
