@@ -43,7 +43,8 @@ export const WorkflowDiagramStepNodeIcon = ({
           );
         }
         case 'FORM':
-        case 'SHOW_IFRAME': {
+        case 'SHOW_IFRAME':
+        case 'SHOW_SIGNATURE': {
           return <Icon size={theme.icon.size.md} color={theme.color.orange} />;
         }
         case 'AI_AGENT': {

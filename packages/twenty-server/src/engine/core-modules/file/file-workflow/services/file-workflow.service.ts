@@ -69,4 +69,55 @@ export class FileWorkflowService {
       }),
     };
   }
+
+  async uploadFileForFilesField({
+    file,
+    filename,
+    workspaceId,
+  }: {
+    file: Buffer;
+    filename: string;
+    workspaceId: string;
+  }): Promise<FileWithSignedUrlDTO> {
+    const { mimeType, ext } = await extractFileInfo({
+      file,
+      filename,
+    });
+
+    const sanitizedFile = sanitizeFile({ file, ext, mimeType });
+
+    const fileId = v4();
+    const name = `${fileId}${isNonEmptyString(ext) ? `.${ext}` : ''}`;
+
+    const { workspaceCustomFlatApplication } =
+      await this.applicationService.findWorkspaceTwentyStandardAndCustomApplicationOrThrow(
+        {
+          workspaceId,
+        },
+      );
+
+    const savedFile = await this.fileStorageService.writeFile({
+      sourceFile: sanitizedFile,
+      resourcePath: `workflow-uploads/${name}`,
+      mimeType,
+      fileFolder: FileFolder.FilesField,
+      applicationUniversalIdentifier:
+        workspaceCustomFlatApplication.universalIdentifier,
+      workspaceId,
+      fileId,
+      settings: {
+        isTemporaryFile: true,
+        toDelete: false,
+      },
+    });
+
+    return {
+      ...savedFile,
+      url: this.fileUrlService.signFileByIdUrl({
+        fileId,
+        workspaceId,
+        fileFolder: FileFolder.FilesField,
+      }),
+    };
+  }
 }

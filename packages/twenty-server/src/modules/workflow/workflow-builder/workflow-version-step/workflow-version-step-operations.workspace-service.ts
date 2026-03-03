@@ -584,6 +584,19 @@ export class WorkflowVersionStepOperationsWorkspaceService {
           },
         };
       }
+      case WorkflowActionType.SHOW_SIGNATURE: {
+        return {
+          builtStep: {
+            ...baseStep,
+            name: 'Collect Signature',
+            type: WorkflowActionType.SHOW_SIGNATURE,
+            settings: {
+              ...BASE_STEP_DEFINITION,
+              input: {},
+            },
+          },
+        };
+      }
       default:
         throw new WorkflowVersionStepException(
           `WorkflowActionType '${type}' unknown`,

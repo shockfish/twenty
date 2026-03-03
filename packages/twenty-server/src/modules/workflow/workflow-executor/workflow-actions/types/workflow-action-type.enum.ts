@@ -17,4 +17,5 @@ export enum WorkflowActionType {
   EMPTY = 'EMPTY',
   DELAY = 'DELAY',
   SHOW_IFRAME = 'SHOW_IFRAME',
+  SHOW_SIGNATURE = 'SHOW_SIGNATURE',
 }

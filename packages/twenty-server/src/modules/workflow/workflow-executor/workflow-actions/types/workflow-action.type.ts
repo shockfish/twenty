@@ -4,6 +4,7 @@ import { type WorkflowDelayActionSettings } from 'src/modules/workflow/workflow-
 import { type WorkflowFilterActionSettings } from 'src/modules/workflow/workflow-executor/workflow-actions/filter/types/workflow-filter-action-settings.type';
 import { type WorkflowFormActionSettings } from 'src/modules/workflow/workflow-executor/workflow-actions/form/types/workflow-form-action-settings.type';
 import { type WorkflowIframeActionSettings } from 'src/modules/workflow/workflow-executor/workflow-actions/iframe/types/workflow-iframe-action-settings.type';
+import { type WorkflowSignatureActionSettings } from 'src/modules/workflow/workflow-executor/workflow-actions/signature/types/workflow-signature-action-settings.type';
 import { type WorkflowHttpRequestActionSettings } from 'src/modules/workflow/workflow-executor/workflow-actions/http-request/types/workflow-http-request-action-settings.type';
 import { type WorkflowIfElseActionSettings } from 'src/modules/workflow/workflow-executor/workflow-actions/if-else/types/workflow-if-else-action-settings.type';
 import { type WorkflowIteratorActionSettings } from 'src/modules/workflow/workflow-executor/workflow-actions/iterator/types/workflow-iterator-action-settings.type';
@@ -126,6 +127,11 @@ export type WorkflowIframeAction = BaseWorkflowAction & {
   settings: WorkflowIframeActionSettings;
 };
 
+export type WorkflowSignatureAction = BaseWorkflowAction & {
+  type: WorkflowActionType.SHOW_SIGNATURE;
+  settings: WorkflowSignatureActionSettings;
+};
+
 export type WorkflowAction =
   | WorkflowCodeAction
   | WorkflowLogicFunctionAction
@@ -144,4 +150,5 @@ export type WorkflowAction =
   | WorkflowIteratorAction
   | WorkflowEmptyAction
   | WorkflowDelayAction
-  | WorkflowIframeAction;
+  | WorkflowIframeAction
+  | WorkflowSignatureAction;

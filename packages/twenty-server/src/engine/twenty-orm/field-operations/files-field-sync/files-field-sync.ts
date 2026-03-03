@@ -293,6 +293,14 @@ export class FilesFieldSync {
     const expectedUniversalIdentifier =
       fileIdToFieldUniversalIdentifier.get(fileId);
 
+    // Files uploaded via workflow (e.g. signature capture) use a generic
+    // 'workflow-uploads/' path and are not tied to a specific field at
+    // upload time. Skip the universal-identifier path check for them so
+    // they can be freely assigned to any FILES field in a workflow action.
+    if (fileEntity.path.includes('workflow-uploads/')) {
+      return;
+    }
+
     if (
       isDefined(expectedUniversalIdentifier) &&
       !fileEntity.path.includes(expectedUniversalIdentifier)

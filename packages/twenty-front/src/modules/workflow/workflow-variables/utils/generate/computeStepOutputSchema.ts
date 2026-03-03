@@ -213,9 +213,21 @@ export const computeStepOutputSchema = ({
       };
     }
 
+    case 'SHOW_SIGNATURE': {
+      return {
+        file: {
+          isLeaf: true,
+          type: FieldMetadataType.FILES,
+          label: 'Signature File',
+          value: null,
+        },
+      };
+    }
+
     case 'FILTER':
     case 'DELAY':
-    case 'EMPTY': {
+    case 'EMPTY':
+    case 'SHOW_IFRAME': {
       return {};
     }
 
