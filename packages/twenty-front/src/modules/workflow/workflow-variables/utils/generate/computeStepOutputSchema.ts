@@ -10,6 +10,7 @@ import { generateFormOutputSchema } from '@/workflow/workflow-variables/utils/ge
 import { generateRecordEventOutputSchema } from '@/workflow/workflow-variables/utils/generate/generateRecordEventOutputSchema';
 import { generateRecordOutputSchema } from '@/workflow/workflow-variables/utils/generate/generateRecordOutputSchema';
 import { FieldMetadataType } from 'twenty-shared/types';
+import { type WorkflowIframeOutputField } from 'twenty-shared/workflow';
 import { isDefined } from 'twenty-shared/utils';
 import { DatabaseEventAction } from '~/generated-metadata/graphql';
 
@@ -224,10 +225,29 @@ export const computeStepOutputSchema = ({
       };
     }
 
+    case 'SHOW_IFRAME': {
+      const outputFields = (
+        step.settings as { outputFields?: WorkflowIframeOutputField[] }
+      )?.outputFields;
+
+      if (!isDefined(outputFields) || outputFields.length === 0) {
+        return {};
+      }
+
+      // Reuse form output schema generator — iframe fields are a subset of form fields
+      const formFields: WorkflowFormActionField[] = outputFields.map((f) => ({
+        id: f.id,
+        name: f.name,
+        label: f.label,
+        type: f.type,
+      }));
+
+      return generateFormOutputSchema(formFields, objectMetadataItems);
+    }
+
     case 'FILTER':
     case 'DELAY':
-    case 'EMPTY':
-    case 'SHOW_IFRAME': {
+    case 'EMPTY': {
       return {};
     }
 

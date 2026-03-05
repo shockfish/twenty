@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
 import { ToolModule } from 'src/engine/core-modules/tool/tool.module';
+import { WorkflowIframeWebhookController } from 'src/engine/core-modules/workflow/controllers/workflow-iframe-webhook.controller';
 import { WorkflowTriggerController } from 'src/engine/core-modules/workflow/controllers/workflow-trigger.controller';
 import { WorkflowBuilderResolver } from 'src/engine/core-modules/workflow/resolvers/workflow-builder.resolver';
 import { WorkflowTriggerResolver } from 'src/engine/core-modules/workflow/resolvers/workflow-trigger.resolver';
@@ -37,7 +38,7 @@ import { WorkflowTriggerModule } from 'src/modules/workflow/workflow-trigger/wor
     CodeStepBuildModule,
     WorkspaceManyOrAllFlatEntityMapsCacheModule,
   ],
-  controllers: [WorkflowTriggerController],
+  controllers: [WorkflowTriggerController, WorkflowIframeWebhookController],
   providers: [
     WorkflowTriggerResolver,
     WorkflowBuilderResolver,
