@@ -30,6 +30,7 @@ import { generateFakeObjectRecord } from 'src/modules/workflow/workflow-builder/
 import { generateFakeObjectRecordEvent } from 'src/modules/workflow/workflow-builder/workflow-schema/utils/generate-fake-object-record-event';
 import { inferArrayItemSchema } from 'src/modules/workflow/workflow-builder/workflow-schema/utils/infer-array-item-schema';
 import { type FormFieldMetadata } from 'src/modules/workflow/workflow-executor/workflow-actions/form/types/workflow-form-action-settings.type';
+import { type WorkflowIframeOutputField } from 'src/modules/workflow/workflow-executor/workflow-actions/iframe/types/workflow-iframe-action-settings.type';
 import {
   type WorkflowAction,
   WorkflowActionType,
@@ -142,6 +143,28 @@ export class WorkflowSchemaWorkspaceService {
             value: null,
           },
         };
+      }
+      case WorkflowActionType.SHOW_IFRAME: {
+        const outputFields = (
+          step.settings as { outputFields?: WorkflowIframeOutputField[] }
+        )?.outputFields;
+
+        if (!isDefined(outputFields) || outputFields.length === 0) {
+          return {};
+        }
+
+        // Reuse form response generator — iframe output fields are a subset of form fields
+        const formFields: FormFieldMetadata[] = outputFields.map((f) => ({
+          id: f.id,
+          name: f.name,
+          label: f.label,
+          type: f.type,
+        }));
+
+        return this.computeFormActionOutputSchema({
+          formFieldMetadataItems: formFields,
+          workspaceId,
+        });
       }
       case WorkflowActionType.CODE: // StepOutput schema is computed on logicFunction draft execution
       default:

@@ -207,7 +207,9 @@ export class WorkflowRunnerWorkspaceService {
         enrichedResponse = { file: null };
       }
     } else {
-      enrichedResponse = {};
+      // For iframe actions, pass the response data through as-is so that
+      // downstream workflow steps can access fields submitted via postMessage.
+      enrichedResponse = response;
     }
 
     await this.workflowRunWorkspaceService.updateWorkflowRunStepInfo({

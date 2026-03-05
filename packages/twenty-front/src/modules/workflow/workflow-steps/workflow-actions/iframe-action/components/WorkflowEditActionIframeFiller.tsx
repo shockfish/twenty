@@ -5,8 +5,10 @@ import { useWorkflowRunIdOrThrow } from '@/workflow/hooks/useWorkflowRunIdOrThro
 import { type WorkflowIframeAction } from '@/workflow/types/Workflow';
 import { WorkflowStepBody } from '@/workflow/workflow-steps/components/WorkflowStepBody';
 import { useSubmitFormStep } from '@/workflow/workflow-steps/workflow-actions/form-action/hooks/useSubmitFormStep';
+import { WORKFLOW_IFRAME_SUBMIT_EVENT_TYPE } from '@/workflow/workflow-steps/workflow-actions/iframe-action/constants/WorkflowIframeSubmitEventType';
 import { useLingui } from '@lingui/react/macro';
 import styled from '@emotion/styled';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 const StyledIframe = styled.iframe`
   border: none;
@@ -30,18 +32,82 @@ export const WorkflowEditActionIframeFiller = ({
   const { submitFormStep } = useSubmitFormStep();
   const workflowRunId = useWorkflowRunIdOrThrow();
   const { goBackFromCommandMenu } = useCommandMenuHistory();
+  const hasSubmittedRef = useRef(false);
 
-  const iframeUrl = action.settings.input.url;
+  const iframeUrl = useMemo(() => {
+    const rawUrl = action.settings.input.url;
 
-  const onSubmit = async () => {
-    await submitFormStep({
-      stepId: action.id,
+    if (!rawUrl) {
+      return rawUrl;
+    }
+
+    try {
+      const url = new URL(rawUrl);
+
+      url.searchParams.set('workflowRunId', workflowRunId);
+      url.searchParams.set('stepId', action.id);
+
+      return url.toString();
+    } catch {
+      return rawUrl;
+    }
+  }, [action.id, action.settings.input.url, workflowRunId]);
+
+  const handleSubmit = useCallback(
+    async (response: object) => {
+      if (hasSubmittedRef.current || actionOptions.readonly) {
+        return;
+      }
+
+      hasSubmittedRef.current = true;
+
+      await submitFormStep({
+        stepId: action.id,
+        workflowRunId,
+        response,
+      });
+
+      goBackFromCommandMenu();
+    },
+    [
+      action.id,
+      actionOptions.readonly,
+      goBackFromCommandMenu,
+      submitFormStep,
       workflowRunId,
-      response: {},
-    });
+    ],
+  );
 
-    goBackFromCommandMenu();
-  };
+  useEffect(() => {
+    if (actionOptions.readonly) {
+      return;
+    }
+
+    const handleMessage = (event: MessageEvent) => {
+      if (
+        !event.data ||
+        typeof event.data !== 'object' ||
+        event.data.type !== WORKFLOW_IFRAME_SUBMIT_EVENT_TYPE
+      ) {
+        return;
+      }
+
+      const data: object =
+        event.data.data !== null &&
+        typeof event.data.data === 'object' &&
+        !Array.isArray(event.data.data)
+          ? event.data.data
+          : {};
+
+      handleSubmit(data);
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [actionOptions.readonly, handleSubmit]);
 
   return (
     <>
@@ -58,7 +124,7 @@ export const WorkflowEditActionIframeFiller = ({
           actions={[
             <CmdEnterActionButton
               title={t`Done`}
-              onClick={onSubmit}
+              onClick={() => handleSubmit({})}
             />,
           ]}
         />
