@@ -177,6 +177,14 @@ export class WorkflowRunnerWorkspaceService {
       );
     }
 
+    // If the step was already completed (e.g. by a webhook), do not overwrite
+    // its result with a potentially empty "Done" button submission from the UI.
+    const existingStepInfo = workflowRun.state?.stepInfos?.[stepId];
+
+    if (existingStepInfo?.status === StepStatus.SUCCESS) {
+      return;
+    }
+
     let enrichedResponse: object;
 
     if (isWorkflowFormAction(step)) {
