@@ -17,6 +17,7 @@ import {
   type workflowHttpRequestActionSchema,
   type workflowIframeActionSchema,
   type workflowSignatureActionSchema,
+  type workflowPdfGeneratorActionSchema,
   type workflowIfElseActionSchema,
   type workflowIteratorActionSchema,
   type workflowLogicFunctionActionSchema,
@@ -66,6 +67,9 @@ export type WorkflowIframeAction = z.infer<typeof workflowIframeActionSchema>;
 export type WorkflowSignatureAction = z.infer<
   typeof workflowSignatureActionSchema
 >;
+export type WorkflowPdfGeneratorAction = z.infer<
+  typeof workflowPdfGeneratorActionSchema
+>;
 export type WorkflowHttpRequestAction = z.infer<
   typeof workflowHttpRequestActionSchema
 >;
@@ -94,7 +98,8 @@ export type WorkflowAction =
   | WorkflowDelayAction
   | WorkflowEmptyAction
   | WorkflowIframeAction
-  | WorkflowSignatureAction;
+  | WorkflowSignatureAction
+  | WorkflowPdfGeneratorAction;
 
 export type WorkflowActionType = WorkflowAction['type'];
 export type WorkflowStep = WorkflowAction;

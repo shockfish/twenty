@@ -22,6 +22,7 @@ import { WorkflowCommonWorkspaceService } from 'src/modules/workflow/common/work
 import { WorkflowVersionStepOperationsWorkspaceService } from 'src/modules/workflow/workflow-builder/workflow-version-step/workflow-version-step-operations.workspace-service';
 import { isWorkflowFormAction } from 'src/modules/workflow/workflow-executor/workflow-actions/form/guards/is-workflow-form-action.guard';
 import { isWorkflowIframeAction } from 'src/modules/workflow/workflow-executor/workflow-actions/iframe/guards/is-workflow-iframe-action.guard';
+import { isWorkflowPdfGeneratorAction } from 'src/modules/workflow/workflow-executor/workflow-actions/pdf-generator/guards/is-workflow-pdf-generator-action.guard';
 import { isWorkflowSignatureAction } from 'src/modules/workflow/workflow-executor/workflow-actions/signature/guards/is-workflow-signature-action.guard';
 import {
   WorkflowRunException,
@@ -164,7 +165,8 @@ export class WorkflowRunnerWorkspaceService {
     if (
       !isWorkflowFormAction(step) &&
       !isWorkflowIframeAction(step) &&
-      !isWorkflowSignatureAction(step)
+      !isWorkflowSignatureAction(step) &&
+      !isWorkflowPdfGeneratorAction(step)
     ) {
       throw new WorkflowVersionStepException(
         'Step is not a form',
@@ -205,6 +207,26 @@ export class WorkflowRunnerWorkspaceService {
         };
       } else {
         enrichedResponse = { file: null };
+      }
+    } else if (isWorkflowPdfGeneratorAction(step)) {
+      const pdfDataUrl = (response as { pdf?: string }).pdf ?? null;
+
+      if (pdfDataUrl) {
+        const base64Data = pdfDataUrl.replace(/^data:[^;]+;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        const uploadedFile =
+          await this.fileWorkflowService.uploadFileForFilesField({
+            file: buffer,
+            filename: 'document.pdf',
+            workspaceId,
+          });
+
+        enrichedResponse = {
+          pdf: [{ fileId: uploadedFile.id, label: 'document.pdf' }],
+        };
+      } else {
+        enrichedResponse = { pdf: null };
       }
     } else {
       // For iframe actions, pass the response data through as-is so that

@@ -12,6 +12,7 @@ import { EmptyActionModule } from 'src/modules/workflow/workflow-executor/workfl
 import { FilterActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/filter/filter-action.module';
 import { FormActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/form/form-action.module';
 import { IframeActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/iframe/iframe-action.module';
+import { PdfGeneratorActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/pdf-generator/pdf-generator-action.module';
 import { SignatureActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/signature/signature-action.module';
 import { IfElseActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/if-else/if-else-action.module';
 import { IteratorActionModule } from 'src/modules/workflow/workflow-executor/workflow-actions/iterator/iterator-action.module';
@@ -38,6 +39,7 @@ import { WorkflowRunModule } from 'src/modules/workflow/workflow-runner/workflow
     EmptyActionModule,
     IframeActionModule,
     SignatureActionModule,
+    PdfGeneratorActionModule,
     FeatureFlagModule,
     ToolModule,
   ],

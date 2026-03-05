@@ -17,6 +17,7 @@ import { WorkflowEditActionFilter } from '@/workflow/workflow-steps/workflow-act
 import { WorkflowEditActionFindRecords } from '@/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords';
 import { WorkflowEditActionFormFiller } from '@/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormFiller';
 import { WorkflowEditActionIframeFiller } from '@/workflow/workflow-steps/workflow-actions/iframe-action/components/WorkflowEditActionIframeFiller';
+import { WorkflowEditActionPdfGeneratorFiller } from '@/workflow/workflow-steps/workflow-actions/pdf-generator-action/components/WorkflowEditActionPdfGeneratorFiller';
 import { WorkflowEditActionSignatureFiller } from '@/workflow/workflow-steps/workflow-actions/signature-action/components/WorkflowEditActionSignatureFiller';
 import { WorkflowEditActionHttpRequest } from '@/workflow/workflow-steps/workflow-actions/http-request-action/components/WorkflowEditActionHttpRequest';
 import { WorkflowEditActionIfElse } from '@/workflow/workflow-steps/workflow-actions/if-else-action/components/WorkflowEditActionIfElse';
@@ -303,6 +304,17 @@ export const WorkflowRunStepNodeDetail = ({
         case 'SHOW_SIGNATURE': {
           return (
             <WorkflowEditActionSignatureFiller
+              key={stepId}
+              action={stepDefinition.definition}
+              actionOptions={{
+                readonly: stepExecutionStatus !== 'PENDING',
+              }}
+            />
+          );
+        }
+        case 'GENERATE_PDF': {
+          return (
+            <WorkflowEditActionPdfGeneratorFiller
               key={stepId}
               action={stepDefinition.definition}
               actionOptions={{

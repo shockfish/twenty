@@ -144,6 +144,16 @@ export class WorkflowSchemaWorkspaceService {
           },
         };
       }
+      case WorkflowActionType.GENERATE_PDF: {
+        return {
+          pdf: {
+            label: 'Generated PDF',
+            isLeaf: true,
+            type: FieldMetadataType.FILES,
+            value: null,
+          },
+        };
+      }
       case WorkflowActionType.SHOW_IFRAME: {
         const outputFields = (
           step.settings as { outputFields?: WorkflowIframeOutputField[] }

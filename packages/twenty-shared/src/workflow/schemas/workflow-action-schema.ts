@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { workflowAiAgentActionSchema } from './ai-agent-action-schema';
 import { workflowIframeActionSchema } from './iframe-action-schema';
+import { workflowPdfGeneratorActionSchema } from './pdf-generator-action-schema';
 import { workflowSignatureActionSchema } from './signature-action-schema';
 import { workflowCodeActionSchema } from './code-action-schema';
 import { workflowCreateRecordActionSchema } from './create-record-action-schema';
@@ -39,4 +40,5 @@ export const workflowActionSchema = z.discriminatedUnion('type', [
   workflowEmptyActionSchema,
   workflowIframeActionSchema,
   workflowSignatureActionSchema,
+  workflowPdfGeneratorActionSchema,
 ]);

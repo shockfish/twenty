@@ -225,6 +225,17 @@ export const computeStepOutputSchema = ({
       };
     }
 
+    case 'GENERATE_PDF': {
+      return {
+        pdf: {
+          isLeaf: true,
+          type: FieldMetadataType.FILES,
+          label: 'Generated PDF',
+          value: null,
+        },
+      };
+    }
+
     case 'SHOW_IFRAME': {
       const outputFields = (
         step.settings as { outputFields?: WorkflowIframeOutputField[] }

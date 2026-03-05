@@ -28,7 +28,9 @@ const shouldOpenStep = ({
   const isStepPending = isDefined(stepInfo) && stepInfo.status === 'PENDING';
   const isStepOpenable =
     isDefined(step) &&
-    ['FORM', 'SHOW_IFRAME', 'SHOW_SIGNATURE'].includes(step.type);
+    ['FORM', 'SHOW_IFRAME', 'SHOW_SIGNATURE', 'GENERATE_PDF'].includes(
+      step.type,
+    );
 
   return isStepPending && isStepOpenable;
 };

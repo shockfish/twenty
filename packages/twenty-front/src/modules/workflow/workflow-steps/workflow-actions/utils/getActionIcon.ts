@@ -25,6 +25,7 @@ export const getActionIcon = (actionType: WorkflowActionType) => {
     case 'FORM':
     case 'SHOW_IFRAME':
     case 'SHOW_SIGNATURE':
+    case 'GENERATE_PDF':
       return HUMAN_INPUT_ACTIONS.find((item) => item.type === actionType)?.icon;
     case 'ITERATOR':
     case 'DELAY':

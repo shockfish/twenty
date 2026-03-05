@@ -25,6 +25,7 @@ export const getActionIconColorOrThrow = ({
     case 'FORM':
     case 'SHOW_IFRAME':
     case 'SHOW_SIGNATURE':
+    case 'GENERATE_PDF':
       return theme.color.orange;
     case 'ITERATOR':
     case 'EMPTY':

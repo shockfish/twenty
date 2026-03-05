@@ -11,6 +11,7 @@ import { CodeWorkflowAction } from 'src/modules/workflow/workflow-executor/workf
 import { DelayWorkflowAction } from 'src/modules/workflow/workflow-executor/workflow-actions/delay/delay.workflow-action';
 import { EmptyWorkflowAction } from 'src/modules/workflow/workflow-executor/workflow-actions/empty/empty.workflow-action';
 import { IframeWorkflowAction } from 'src/modules/workflow/workflow-executor/workflow-actions/iframe/iframe.workflow-action';
+import { PdfGeneratorWorkflowAction } from 'src/modules/workflow/workflow-executor/workflow-actions/pdf-generator/pdf-generator.workflow-action';
 import { SignatureWorkflowAction } from 'src/modules/workflow/workflow-executor/workflow-actions/signature/signature.workflow-action';
 import { FilterWorkflowAction } from 'src/modules/workflow/workflow-executor/workflow-actions/filter/filter.workflow-action';
 import { FormWorkflowAction } from 'src/modules/workflow/workflow-executor/workflow-actions/form/form.workflow-action';
@@ -45,6 +46,7 @@ export class WorkflowActionFactory {
     private readonly delayWorkflowAction: DelayWorkflowAction,
     private readonly iframeWorkflowAction: IframeWorkflowAction,
     private readonly signatureWorkflowAction: SignatureWorkflowAction,
+    private readonly pdfGeneratorWorkflowAction: PdfGeneratorWorkflowAction,
   ) {}
 
   get(stepType: WorkflowActionType): WorkflowAction {
@@ -87,6 +89,8 @@ export class WorkflowActionFactory {
         return this.iframeWorkflowAction;
       case WorkflowActionType.SHOW_SIGNATURE:
         return this.signatureWorkflowAction;
+      case WorkflowActionType.GENERATE_PDF:
+        return this.pdfGeneratorWorkflowAction;
       default:
         throw new WorkflowStepExecutorException(
           `Workflow step executor not found for step type '${stepType}'`,

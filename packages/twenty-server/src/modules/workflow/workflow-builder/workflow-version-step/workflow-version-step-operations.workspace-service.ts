@@ -597,6 +597,22 @@ export class WorkflowVersionStepOperationsWorkspaceService {
           },
         };
       }
+      case WorkflowActionType.GENERATE_PDF: {
+        return {
+          builtStep: {
+            ...baseStep,
+            name: 'Generate PDF',
+            type: WorkflowActionType.GENERATE_PDF,
+            settings: {
+              ...BASE_STEP_DEFINITION,
+              input: {
+                title: '',
+                rows: [],
+              },
+            },
+          },
+        };
+      }
       default:
         throw new WorkflowVersionStepException(
           `WorkflowActionType '${type}' unknown`,

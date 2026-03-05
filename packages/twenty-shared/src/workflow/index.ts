@@ -52,6 +52,12 @@ export { workflowLogicFunctionActionSchema } from './schemas/logic-function-acti
 export { workflowLogicFunctionActionSettingsSchema } from './schemas/logic-function-action-settings-schema';
 export { workflowManualTriggerSchema } from './schemas/manual-trigger-schema';
 export { objectRecordSchema } from './schemas/object-record-schema';
+export { workflowPdfGeneratorActionSchema } from './schemas/pdf-generator-action-schema';
+export type { WorkflowPdfGeneratorRow } from './schemas/pdf-generator-action-settings-schema';
+export {
+  workflowPdfGeneratorRowSchema,
+  workflowPdfGeneratorActionSettingsSchema,
+} from './schemas/pdf-generator-action-settings-schema';
 export { workflowSendEmailActionSchema } from './schemas/send-email-action-schema';
 export { workflowSendEmailActionSettingsSchema } from './schemas/send-email-action-settings-schema';
 export { workflowSignatureActionSchema } from './schemas/signature-action-schema';

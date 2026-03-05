@@ -18,4 +18,5 @@ export enum WorkflowActionType {
   DELAY = 'DELAY',
   SHOW_IFRAME = 'SHOW_IFRAME',
   SHOW_SIGNATURE = 'SHOW_SIGNATURE',
+  GENERATE_PDF = 'GENERATE_PDF',
 }
