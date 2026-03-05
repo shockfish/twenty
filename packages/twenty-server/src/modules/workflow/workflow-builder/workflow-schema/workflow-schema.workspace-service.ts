@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { isString } from '@sniptt/guards';
+import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined, isValidVariable } from 'twenty-shared/utils';
 import {
   BaseOutputSchemaV2,
@@ -129,6 +130,16 @@ export class WorkflowSchemaWorkspaceService {
             isLeaf: true,
             type: 'string',
             value: 'Response of the agent',
+          },
+        };
+      }
+      case WorkflowActionType.SHOW_SIGNATURE: {
+        return {
+          file: {
+            label: 'Signature File',
+            isLeaf: true,
+            type: FieldMetadataType.FILES,
+            value: null,
           },
         };
       }

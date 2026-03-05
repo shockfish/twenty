@@ -6,6 +6,7 @@ import { isDefined } from 'twenty-shared/utils';
 import { StepStatus } from 'twenty-shared/workflow';
 
 import { BillingUsageService } from 'src/engine/core-modules/billing/services/billing-usage.service';
+import { FileWorkflowService } from 'src/engine/core-modules/file/file-workflow/services/file-workflow.service';
 import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
@@ -21,6 +22,7 @@ import { WorkflowCommonWorkspaceService } from 'src/modules/workflow/common/work
 import { WorkflowVersionStepOperationsWorkspaceService } from 'src/modules/workflow/workflow-builder/workflow-version-step/workflow-version-step-operations.workspace-service';
 import { isWorkflowFormAction } from 'src/modules/workflow/workflow-executor/workflow-actions/form/guards/is-workflow-form-action.guard';
 import { isWorkflowIframeAction } from 'src/modules/workflow/workflow-executor/workflow-actions/iframe/guards/is-workflow-iframe-action.guard';
+import { isWorkflowSignatureAction } from 'src/modules/workflow/workflow-executor/workflow-actions/signature/guards/is-workflow-signature-action.guard';
 import {
   WorkflowRunException,
   WorkflowRunExceptionCode,
@@ -47,6 +49,7 @@ export class WorkflowRunnerWorkspaceService {
     private readonly workflowVersionStepOperationsWorkspaceService: WorkflowVersionStepOperationsWorkspaceService,
     private readonly workflowThrottlingWorkspaceService: WorkflowThrottlingWorkspaceService,
     private readonly metricsService: MetricsService,
+    private readonly fileWorkflowService: FileWorkflowService,
   ) {}
 
   async run({
@@ -158,7 +161,11 @@ export class WorkflowRunnerWorkspaceService {
       );
     }
 
-    if (!isWorkflowFormAction(step) && !isWorkflowIframeAction(step)) {
+    if (
+      !isWorkflowFormAction(step) &&
+      !isWorkflowIframeAction(step) &&
+      !isWorkflowSignatureAction(step)
+    ) {
       throw new WorkflowVersionStepException(
         'Step is not a form',
         WorkflowVersionStepExceptionCode.INVALID_REQUEST,
@@ -168,15 +175,40 @@ export class WorkflowRunnerWorkspaceService {
       );
     }
 
-    const enrichedResponse = isWorkflowFormAction(step)
-      ? await this.workflowVersionStepOperationsWorkspaceService.enrichFormStepResponse(
+    let enrichedResponse: object;
+
+    if (isWorkflowFormAction(step)) {
+      enrichedResponse =
+        await this.workflowVersionStepOperationsWorkspaceService.enrichFormStepResponse(
           {
             workspaceId,
             step,
             response,
           },
-        )
-      : {};
+        );
+    } else if (isWorkflowSignatureAction(step)) {
+      const signature = (response as { signature?: string }).signature ?? null;
+
+      if (signature) {
+        const base64Data = signature.replace(/^data:image\/\w+;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        const uploadedFile =
+          await this.fileWorkflowService.uploadFileForFilesField({
+            file: buffer,
+            filename: 'signature.png',
+            workspaceId,
+          });
+
+        enrichedResponse = {
+          file: [{ fileId: uploadedFile.id, label: 'signature.png' }],
+        };
+      } else {
+        enrichedResponse = { file: null };
+      }
+    } else {
+      enrichedResponse = {};
+    }
 
     await this.workflowRunWorkspaceService.updateWorkflowRunStepInfo({
       stepId,

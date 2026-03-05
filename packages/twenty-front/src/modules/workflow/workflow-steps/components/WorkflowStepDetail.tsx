@@ -16,6 +16,7 @@ import { WorkflowEditActionFilter } from '@/workflow/workflow-steps/workflow-act
 import { WorkflowEditActionFindRecords } from '@/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords';
 import { WorkflowEditActionFormBuilder } from '@/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormBuilder';
 import { WorkflowEditActionIframe } from '@/workflow/workflow-steps/workflow-actions/iframe-action/components/WorkflowEditActionIframe';
+import { WorkflowEditActionSignature } from '@/workflow/workflow-steps/workflow-actions/signature-action/components/WorkflowEditActionSignature';
 import { WorkflowEditActionHttpRequest } from '@/workflow/workflow-steps/workflow-actions/http-request-action/components/WorkflowEditActionHttpRequest';
 import { WorkflowEditActionIfElse } from '@/workflow/workflow-steps/workflow-actions/if-else-action/components/WorkflowEditActionIfElse';
 import { WorkflowEditActionIterator } from '@/workflow/workflow-steps/workflow-actions/iterator-action/components/WorkflowEditActionIterator';
@@ -257,6 +258,15 @@ export const WorkflowStepDetail = ({
         case 'SHOW_IFRAME': {
           return (
             <WorkflowEditActionIframe
+              key={stepId}
+              action={stepDefinition.definition}
+              actionOptions={props}
+            />
+          );
+        }
+        case 'SHOW_SIGNATURE': {
+          return (
+            <WorkflowEditActionSignature
               key={stepId}
               action={stepDefinition.definition}
               actionOptions={props}

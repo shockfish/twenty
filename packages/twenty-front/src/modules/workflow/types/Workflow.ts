@@ -16,6 +16,7 @@ import {
   type workflowFormActionSchema,
   type workflowHttpRequestActionSchema,
   type workflowIframeActionSchema,
+  type workflowSignatureActionSchema,
   type workflowIfElseActionSchema,
   type workflowIteratorActionSchema,
   type workflowLogicFunctionActionSchema,
@@ -62,6 +63,9 @@ export type WorkflowFilterAction = z.infer<typeof workflowFilterActionSchema>;
 export type WorkflowFormAction = z.infer<typeof workflowFormActionSchema>;
 export type WorkflowIfElseAction = z.infer<typeof workflowIfElseActionSchema>;
 export type WorkflowIframeAction = z.infer<typeof workflowIframeActionSchema>;
+export type WorkflowSignatureAction = z.infer<
+  typeof workflowSignatureActionSchema
+>;
 export type WorkflowHttpRequestAction = z.infer<
   typeof workflowHttpRequestActionSchema
 >;
@@ -89,7 +93,8 @@ export type WorkflowAction =
   | WorkflowIteratorAction
   | WorkflowDelayAction
   | WorkflowEmptyAction
-  | WorkflowIframeAction;
+  | WorkflowIframeAction
+  | WorkflowSignatureAction;
 
 export type WorkflowActionType = WorkflowAction['type'];
 export type WorkflowStep = WorkflowAction;

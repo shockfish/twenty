@@ -54953,6 +54953,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"signature_pad@npm:^5.1.3":
+  version: 5.1.3
+  resolution: "signature_pad@npm:5.1.3"
+  checksum: 10c0/660599a0f657fbed0ef5561320b44a03bbb6d6be76885fd0176210ccab626470e815d84fd8dbf08637a89c3256e4e00a2bda98803050231aadd0ccc10848ac93
+  languageName: node
+  linkType: hard
+
 "signedsource@npm:^1.0.0":
   version: 1.0.0
   resolution: "signedsource@npm:1.0.0"
@@ -57843,6 +57850,7 @@ __metadata:
     react-textarea-autosize: "npm:^8.4.1"
     remark-gfm: "npm:^4.0.1"
     rollup-plugin-visualizer: "npm:^5.14.0"
+    signature_pad: "npm:^5.1.3"
     transliteration: "npm:^2.3.5"
     twenty-sdk: "workspace:*"
     twenty-shared: "workspace:*"
