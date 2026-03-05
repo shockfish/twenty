@@ -114,6 +114,9 @@ export const WorkflowEditActionPdfGeneratorFiller = ({
   const [status, setStatus] = useState<'generating' | 'submitting' | 'error'>(
     'generating',
   );
+  // Prevents restarting generation when stepInfos reference changes (Zod creates
+  // a new object on every parse, which would otherwise cancel an ongoing generation)
+  const hasStartedRef = useRef(false);
   const hasSubmittedRef = useRef(false);
 
   useEffect(() => {
@@ -122,18 +125,13 @@ export const WorkflowEditActionPdfGeneratorFiller = ({
     // Wait until the workflow run state is loaded (previous step outputs needed for variable resolution)
     const stepInfos = workflowRun?.state?.stepInfos;
     if (!stepInfos) return;
-
-    let cancelled = false;
+    // Prevent restarting generation when stepInfos reference changes mid-generation
+    if (hasStartedRef.current) return;
+    hasStartedRef.current = true;
 
     const generateAndSubmit = async () => {
       try {
-        // eslint-disable-next-line no-console
-        console.log('[GeneratePDF] Step 1: resolving variables', { stepInfos });
-
         const context = getWorkflowRunContext(stepInfos);
-
-        // eslint-disable-next-line no-console
-        console.log('[GeneratePDF] Step 2: context built', { context });
 
         let resolvedRows: Array<{ id: string; label: string; value: unknown }> =
           [];
@@ -154,30 +152,14 @@ export const WorkflowEditActionPdfGeneratorFiller = ({
           resolvedRows = Array.isArray(resolvedInput?.rows)
             ? resolvedInput.rows
             : action.settings.input.rows;
-        } catch (resolveErr) {
-          // eslint-disable-next-line no-console
-          console.warn(
-            '[GeneratePDF] resolveInput failed, using raw values:',
-            resolveErr,
-          );
+        } catch {
           resolvedTitle = action.settings.input.title;
           resolvedRows = action.settings.input.rows;
         }
 
-        // eslint-disable-next-line no-console
-        console.log('[GeneratePDF] Step 3: rendering PDF', {
-          resolvedTitle,
-          resolvedRows,
-        });
-
         const blob = await pdf(
-          <PdfVariablesDocument
-            title={resolvedTitle}
-            rows={resolvedRows}
-          />,
+          <PdfVariablesDocument title={resolvedTitle} rows={resolvedRows} />,
         ).toBlob();
-
-        if (cancelled || hasSubmittedRef.current) return;
 
         // Convert to base64 data URL
         const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -187,8 +169,7 @@ export const WorkflowEditActionPdfGeneratorFiller = ({
           reader.readAsDataURL(blob);
         });
 
-        if (cancelled || hasSubmittedRef.current) return;
-
+        if (hasSubmittedRef.current) return;
         hasSubmittedRef.current = true;
         setStatus('submitting');
 
@@ -198,23 +179,17 @@ export const WorkflowEditActionPdfGeneratorFiller = ({
           response: { pdf: dataUrl },
         });
 
-        if (!cancelled) {
-          goBackFromCommandMenu();
-        }
+        goBackFromCommandMenu();
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('[GeneratePDF] Failed to generate or submit PDF:', error);
-        if (!cancelled) {
-          setStatus('error');
-        }
+        // Allow retry if generation failed
+        hasStartedRef.current = false;
+        setStatus('error');
       }
     };
 
     generateAndSubmit();
-
-    return () => {
-      cancelled = true;
-    };
   }, [workflowRun?.state?.stepInfos, actionOptions.readonly]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (actionOptions.readonly) {

@@ -13,7 +13,8 @@ export const getShouldFocusNodeTab = ({
   return (
     (actionType === 'FORM' ||
       actionType === 'SHOW_IFRAME' ||
-      actionType === 'SHOW_SIGNATURE') &&
+      actionType === 'SHOW_SIGNATURE' ||
+      actionType === 'GENERATE_PDF') &&
     stepExecutionStatus === 'PENDING'
   );
 };
