@@ -14,35 +14,44 @@ import {
   View,
   pdf,
 } from '@react-pdf/renderer';
-import { useEffect, useRef, useState } from 'react';
-import { resolveInput } from 'twenty-shared/utils';
+import { useEffect, useState } from 'react';
+import { isDefined, resolveInput } from 'twenty-shared/utils';
 import { getWorkflowRunContext } from 'twenty-shared/workflow';
+
+// Static colors used in the PDF document — theme variables are not available in @react-pdf/renderer
+// eslint-disable-next-line twenty/no-hardcoded-colors
+const PDF_BORDER_COLOR = '#e5e7eb';
+// eslint-disable-next-line twenty/no-hardcoded-colors
+const PDF_ROW_EVEN_BG_COLOR = '#f9fafb';
+
+const PDF_FONT_REGULAR = 'Helvetica';
+const PDF_FONT_BOLD = 'Helvetica-Bold';
 
 const pdfStyles = StyleSheet.create({
   page: {
-    fontFamily: 'Helvetica',
+    fontFamily: PDF_FONT_REGULAR,
     padding: 40,
   },
   title: {
     fontSize: 18,
-    fontFamily: 'Helvetica-Bold',
+    fontFamily: PDF_FONT_BOLD,
     marginBottom: 20,
   },
   table: {
     width: '100%',
   },
   row: {
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: PDF_BORDER_COLOR,
     borderBottomWidth: 1,
     display: 'flex',
     flexDirection: 'row',
   },
   rowEven: {
-    backgroundColor: '#f9fafb',
+    backgroundColor: PDF_ROW_EVEN_BG_COLOR,
   },
   labelCell: {
     fontSize: 11,
-    fontFamily: 'Helvetica-Bold',
+    fontFamily: PDF_FONT_BOLD,
     padding: 8,
     width: '40%',
   },
@@ -60,15 +69,17 @@ const formatResolvedValue = (value: unknown): string => {
   return String(value);
 };
 
-type PdfDocumentProps = {
+type PdfVariablesDocumentProps = {
   title?: string;
   rows: Array<{ id: string; label: string; value: unknown }>;
 };
 
-const PdfVariablesDocument = ({ title, rows }: PdfDocumentProps) => (
+const PdfVariablesDocument = ({ title, rows }: PdfVariablesDocumentProps) => (
   <Document>
     <Page size="A4" style={pdfStyles.page}>
-      {title ? <Text style={pdfStyles.title}>{formatResolvedValue(title)}</Text> : null}
+      {title ? (
+        <Text style={pdfStyles.title}>{formatResolvedValue(title)}</Text>
+      ) : null}
       <View style={pdfStyles.table}>
         {rows.map((row, index) => (
           <View
@@ -111,23 +122,23 @@ export const WorkflowEditActionPdfGeneratorFiller = ({
   const workflowRun = useWorkflowRun({ workflowRunId });
   const { goBackFromCommandMenu } = useCommandMenuHistory();
 
-  const [status, setStatus] = useState<'generating' | 'submitting' | 'error'>(
-    'generating',
-  );
-  // Prevents restarting generation when stepInfos reference changes (Zod creates
-  // a new object on every parse, which would otherwise cancel an ongoing generation)
-  const hasStartedRef = useRef(false);
-  const hasSubmittedRef = useRef(false);
+  // 'idle' = waiting for stepInfos to load before starting generation
+  const [status, setStatus] = useState<
+    'idle' | 'generating' | 'submitting' | 'error'
+  >('idle');
 
   useEffect(() => {
     // In readonly mode (viewing a completed run) skip generation entirely
-    if (actionOptions.readonly) return;
+    if (actionOptions.readonly === true) return;
+    // Only start generation once — prevents restarting when stepInfos reference
+    // changes (Zod creates a new object on every parse)
+    if (status !== 'idle') return;
     // Wait until the workflow run state is loaded (previous step outputs needed for variable resolution)
     const stepInfos = workflowRun?.state?.stepInfos;
-    if (!stepInfos) return;
-    // Prevent restarting generation when stepInfos reference changes mid-generation
-    if (hasStartedRef.current) return;
-    hasStartedRef.current = true;
+    if (!isDefined(stepInfos)) return;
+
+    // Mark as started synchronously before the async work begins
+    setStatus('generating');
 
     const generateAndSubmit = async () => {
       try {
@@ -169,8 +180,6 @@ export const WorkflowEditActionPdfGeneratorFiller = ({
           reader.readAsDataURL(blob);
         });
 
-        if (hasSubmittedRef.current) return;
-        hasSubmittedRef.current = true;
         setStatus('submitting');
 
         await submitFormStep({
@@ -183,14 +192,12 @@ export const WorkflowEditActionPdfGeneratorFiller = ({
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('[GeneratePDF] Failed to generate or submit PDF:', error);
-        // Allow retry if generation failed
-        hasStartedRef.current = false;
         setStatus('error');
       }
     };
 
     generateAndSubmit();
-  }, [workflowRun?.state?.stepInfos, actionOptions.readonly]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [workflowRun?.state?.stepInfos, actionOptions.readonly, status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (actionOptions.readonly) {
     return null;
@@ -198,7 +205,7 @@ export const WorkflowEditActionPdfGeneratorFiller = ({
 
   return (
     <WorkflowStepBody>
-      {status === 'generating' && (
+      {(status === 'idle' || status === 'generating') && (
         <StyledStatusText>{t`Generating PDF…`}</StyledStatusText>
       )}
       {status === 'submitting' && (
@@ -210,4 +217,3 @@ export const WorkflowEditActionPdfGeneratorFiller = ({
     </WorkflowStepBody>
   );
 };
-

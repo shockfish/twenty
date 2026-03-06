@@ -15,6 +15,7 @@ import { useCallback } from 'react';
 import { isDefined, isNonEmptyArray } from 'twenty-shared/utils';
 import {
   DatabaseEventAction,
+  FieldMetadataType,
   type ObjectRecordEvent,
 } from '~/generated-metadata/graphql';
 
@@ -44,8 +45,6 @@ export const useTriggerOptimisticEffectFromSseUpdateEvents = () => {
         if (!isDefined(updatedRecord)) {
           continue;
         }
-
-        upsertRecordsInStore({ partialRecords: [updatedRecord] });
 
         const computedOptimisticRecord = {
           ...computeOptimisticRecordFromInput({
@@ -90,6 +89,53 @@ export const useTriggerOptimisticEffectFromSseUpdateEvents = () => {
         ) {
           continue;
         }
+
+        // SSE events carry raw DB data for FILES fields: { fileId, label, extension }
+        // but omit the computed `url` (signed URL). Apollo cache writes fail when the
+        // cache fragment expects `url` but the incoming data doesn't have it.
+        // Fix: copy `url` values from the already-cached FILES items (by fileId) into
+        // the optimistic record so the cache write succeeds. New files (not yet cached)
+        // get url: null, which is valid since the field is nullable in GraphQL.
+        const cachedRecordAsMap = cachedRecord as Record<string, unknown>;
+        const optimisticRecordAsMap = computedOptimisticRecord as Record<
+          string,
+          unknown
+        >;
+
+        for (const field of objectMetadataItem.fields) {
+          if (field.type !== FieldMetadataType.FILES) {
+            continue;
+          }
+
+          const optimisticFiles = optimisticRecordAsMap[field.name];
+
+          if (!Array.isArray(optimisticFiles)) {
+            continue;
+          }
+
+          const cachedFiles = cachedRecordAsMap[field.name];
+          const cachedUrlByFileId = new Map<string, string | null>();
+
+          if (Array.isArray(cachedFiles)) {
+            for (const cachedFile of cachedFiles) {
+              if (isDefined(cachedFile?.fileId)) {
+                cachedUrlByFileId.set(
+                  cachedFile.fileId,
+                  cachedFile.url ?? null,
+                );
+              }
+            }
+          }
+
+          optimisticRecordAsMap[field.name] = optimisticFiles.map(
+            (file: { fileId?: string; [key: string]: unknown }) => ({
+              ...file,
+              url: cachedUrlByFileId.get(file.fileId ?? '') ?? null,
+            }),
+          );
+        }
+
+        upsertRecordsInStore({ partialRecords: [computedOptimisticRecord] });
 
         updateRecordFromCache({
           objectMetadataItems,

@@ -9,4 +9,3 @@ export const PDF_GENERATOR_ACTION: {
   type: 'GENERATE_PDF',
   icon: 'IconFileTypePdf',
 };
-

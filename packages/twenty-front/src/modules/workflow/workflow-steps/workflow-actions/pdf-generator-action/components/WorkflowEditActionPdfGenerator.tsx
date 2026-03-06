@@ -151,9 +151,7 @@ export const WorkflowEditActionPdfGenerator = ({
                     defaultValue={row.label}
                     placeholder={t`e.g. Full Name`}
                     readonly={actionOptions.readonly}
-                    onChange={(value) =>
-                      handleLabelChange(row.id, value ?? '')
-                    }
+                    onChange={(value) => handleLabelChange(row.id, value ?? '')}
                   />
                 </StyledFieldWrapper>
                 <StyledFieldWrapper>
@@ -194,4 +192,3 @@ export const WorkflowEditActionPdfGenerator = ({
     </>
   );
 };
-
